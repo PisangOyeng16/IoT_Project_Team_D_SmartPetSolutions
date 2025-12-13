@@ -143,7 +143,7 @@ void loop() {
     return;
   }
 
-  // --- Main logic ---
+  // --- Main logic --- ---> this is where the authors part begins.
   if (settingState == NOT_SETTING && manualState == MANUAL_IDLE) {
     checkScheduledFeeding();
   }
@@ -241,18 +241,6 @@ void startManualFeeding(float weight) {
   updateDisplay();
 }
 
-
-void openFeeder() {
-  feedServo.write(servoOpenAngle);
-  feederOpen = true;
-  Serial.println("Feeder opened (180 deg)");
-}
-
-void closeFeeder() {
-  feedServo.write(servoCloseAngle);
-  feederOpen = false;
-  Serial.println("Feeder closed (0 deg)");
-}
 
 // --- Feeding monitor (scheduled + manual) ---
 void monitorFeeding() {
@@ -352,7 +340,7 @@ void resetSystemState() {
     feedLog[i].used = false;
   }
 
-#if SIM_FAKE_WEIGHT
+#if SIM_FAKE_WEIGHT     // --> this is where the author contributed.
   simWeight = 0.0f;
 #else
   scale.tare();
@@ -441,133 +429,6 @@ DateTime getNextFeedingTime() {
   return nextFeed;
 }
 
-void updateDisplay() {
-  DateTime now = rtc_ok ? rtc.now()
-                        : DateTime(2025, 1, 1, 0, 0, (millis()/1000) % 60);
-  lcd.clear();
-
-  // --- Manual feeding weight selection screen ---
-  if (manualState == MANUAL_SET_WEIGHT) {
-    lcd.setCursor(0, 0);
-    lcd.print("  Manual Feeding  ");
-
-    lcd.setCursor(0, 1);
-    lcd.print("Amount: ");
-    lcd.print((int)manualTempWeight);
-    lcd.print("g   ");
-
-    lcd.setCursor(0, 2);
-    lcd.print("UP/DOWN: adjust");
-
-    lcd.setCursor(0, 3);
-    lcd.print("GREEN: start feed");
-    return;  // don't draw other screens
-  }
-
-  if (settingState != NOT_SETTING) {
-    lcd.setCursor(0, 0);
-    lcd.print("Setting SLOT");
-    lcd.print(currentSlot + 1);
-
-    lcd.setCursor(0, 1);
-    lcd.print("Hour: ");
-    if (tempHour < 10) lcd.print("0");
-    lcd.print(tempHour);
-    if (settingState == SETTING_HOUR) lcd.print(" <--");
-
-    lcd.setCursor(0, 2);
-    lcd.print("Min:  ");
-    if (tempMinute < 10) lcd.print("0");
-    lcd.print(tempMinute);
-    if (settingState == SETTING_MINUTE) lcd.print(" <--");
-
-    lcd.setCursor(0, 3);
-    lcd.print("Weight: ");
-    lcd.print((int)tempWeight);
-    lcd.print("g");
-    if (settingState == SETTING_WEIGHT) lcd.print(" <--");
-
-    if (settingState == SAVING) {
-      lcd.clear();
-      lcd.setCursor(0, 1);
-      lcd.print("  Settings Saved!");
-      lcd.setCursor(0, 2);
-      lcd.print("  Press GREEN");
-    }
-
-  } else if (showSlots) {
-    lcd.setCursor(0, 0);
-    lcd.print("SLOTS   ");
-    if (now.hour() < 10) lcd.print("0");
-    lcd.print(now.hour());
-    lcd.print(":");
-    if (now.minute() < 10) lcd.print("0");
-    lcd.print(now.minute());
-
-    for (int i = 0; i < 3; i++) {
-      lcd.setCursor(0, i + 1);
-      lcd.print(i == currentSlot ? ">" : " ");
-      lcd.print("SLOT");
-      lcd.print(i + 1);
-      lcd.print(":");
-      if (slots[i].active && slots[i].weight > 0) {
-        if (slots[i].hour < 10) lcd.print("0");
-        lcd.print(slots[i].hour);
-        lcd.print(":");
-        if (slots[i].minute < 10) lcd.print("0");
-        lcd.print(slots[i].minute);
-        lcd.print(",");
-        lcd.print((int)slots[i].weight);
-        lcd.print("g");
-      } else {
-        lcd.print("Empty");
-      }
-    }
-
-  } else {
-    // --- Main screen ---
-    lcd.setCursor(0, 0);
-    lcd.print("Time: ");
-    if (now.hour() < 10) lcd.print("0");
-    lcd.print(now.hour());
-    lcd.print(":");
-    if (now.minute() < 10) lcd.print("0");
-    lcd.print(now.minute());
-    lcd.print(":");
-    if (now.second() < 10) lcd.print("0");
-    lcd.print(now.second());
-
-    lcd.setCursor(0, 1);
-    lcd.print("Weight: ");
-    lcd.print(currentWeight, 1);
-    lcd.print("g");
-
-    if (feedingActive) {
-      lcd.setCursor(0, 2);
-      lcd.print("Feeding in progress");
-      lcd.setCursor(0, 3);
-      if (manualMode) {
-        lcd.print("Manual Target: ");
-      } else {
-        lcd.print("Target: ");
-      }
-      lcd.print((int)currentTargetWeight);
-      lcd.print("g");
-    } else {
-      lcd.setCursor(0, 2);
-      lcd.print("Next: ");
-      DateTime nextFeed = getNextFeedingTime();
-      if (nextFeed.hour() < 10) lcd.print("0");
-      lcd.print(nextFeed.hour());
-      lcd.print(":");
-      if (nextFeed.minute() < 10) lcd.print("0");
-      lcd.print(nextFeed.minute());
-
-      lcd.setCursor(0, 3);
-      lcd.print("GREEN: Manual feed");
-    }
-  }
-}
 
 void addFeedLog(bool manual, int slotIndex, float target, float finalWeight) {
   // Shift older entries down (newest at index 0)
