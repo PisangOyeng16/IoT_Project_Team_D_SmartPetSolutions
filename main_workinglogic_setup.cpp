@@ -45,6 +45,8 @@ bool rtc_ok = false;
 
 // ============================================================================= feeding logic state =========================================================
 // This is the main working logic pipeline for the pet feeder device. 
+
+// in the void loop function, the author contributed to the main logic of the pet feeder device.
 void loop() {
   server.handleClient();
 
@@ -310,6 +312,7 @@ void finishFeeding() {
   delay(3000);
 }
 
+// the author contributed to reset the system state logic of the pet feeder device.
 void resetSystemState() {
   feedingActive = false;
   feederOpen = false;
@@ -331,11 +334,11 @@ void resetSystemState() {
   lastTriggerHour = -1;
   lastTriggerMinute = -1;
 
-  slots[0] = {false, 8, 0, 0};
+  slots[0] = {false, 8, 0, 0};    // --> this is where the author contributed.
   slots[1] = {false, 12, 0, 0};
   slots[2] = {false, 18, 0, 0};
 
-  feedLogCount = 0;
+  feedLogCount = 0;         // --> this is where the author contributed.
   for (int i = 0; i < MAX_FEED_LOGS; ++i) {
     feedLog[i].used = false;
   }
