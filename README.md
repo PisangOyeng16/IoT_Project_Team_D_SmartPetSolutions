@@ -1,5 +1,7 @@
 # ESP32 Machine Logic Code Explanation
 
+*NOTE: the code for this can be found in the main_workinglogic_setup.cpp file
+
 ====== Main logic =====
  can be found at the end of the loop() section.
  how does it functions?
@@ -50,3 +52,48 @@
  - stuck / jam detection logic, which only checks while the feeder is open.
  - safety timeouts, to stop everything if errors arises.
  - periodic status logging.
+
+===== finish feeding =====
+ this function is used as the function to close all logic when feeding is completed / jam detected / timeout triggered.
+ its responsibilites is to finalize the feeding session safely, log activities that happened, reset all feeding-related state, and update the user interface.
+
+ for this function, the program will do these several things:
+ - capture feeding context (before reset), saving the machines state.
+ - log the feeding event, record all events.
+ - reset feeding logic flags
+ - debug feedback / state validation
+ - user feedback on LCD.
+
+===== reset system state =====
+ this function is used as the logic to factory reset / clean reboot the esp32 feeder system state.
+ the purpose is to force the system into a known-safe-idle state, remove any leftover feeding/scheduling/UI state, restore default schedules, clear feeding history, reinitialize weight sensing, and ensure hardware is closed.
+
+ for the author's function, the program wiil do these several things:
+ - reset all feeding slots schedulling, weight, and state value to default.
+ - clear feeding history -- to reset history count, marks all entries unused, and prevents old feeding data from appearing.
+ - reset all weight sensors.
+ - force hardware & UI into safe state.
+
+===== handle setting mode =====
+ this functions take on the logic side of the scheduled feeding setting mode.
+ this function will only appear if you are in the setting slots screen and pressed the green button.
+ the flow of the function is as follows:
+ enter setting mode --> set hour --> set minute --> set weight --> save options --> exit setting mode.
+
+===== adjust setting value =====
+ this function is directly correlated to the handle setting mode. it is basically the one that deals with the value adjustment change inside said mode.
+
+===== save current slot =====
+ this function serves as the section to save the values edited in the setting mode.
+ it also displays your selected slot and set value once saved.
+
+===== add feed log =====
+ this function records one completed feeding event into teh feeders history.
+ 
+ for the author's function, the program wiil do these several things:
+ - shift old logs down to make space for newest logs.
+ - get the current time from RTC or from millis simulated time.
+ - logs feeding metadata.
+ - logs feeding time.
+ - stores target weight and final weight.
+ - maintain log count safely, which prevents overflow, ensures UI knows how many valid entries exist, and stops incrementing score once buffer is full.
