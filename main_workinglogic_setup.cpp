@@ -312,7 +312,7 @@ void finishFeeding() {
   delay(3000);
 }
 
-// the author contributed to reset the system state logic of the pet feeder device.
+// the author partially contributed to reset the system state logic of the pet feeder device.
 void resetSystemState() {
   feedingActive = false;
   feederOpen = false;
