@@ -259,6 +259,173 @@
 </section>
 
 
+<!-- Part Overview -->
+<section class="section hero is-small">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content">
+
+          <h2 class="title is-3 has-text-centered"
+              style="background: linear-gradient(45deg, #f200b571, #eb419f8e, #0077ff5b, #2881cad7);
+                     color: white;
+                     padding: 10px;
+                     border-radius: 10px;
+                     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);">
+            Part Overview
+          </h2>
+
+          <div class="content has-text-justified"
+               style="background: #ffffff;
+                      padding: 25px;
+                      border-radius: 15px;
+                      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);">
+
+            <h4 class="title is-5">Main Control Logic (loop)</h4>
+            <p>
+              The main decision-making logic of the system is located at the end of the
+              <code>loop()</code> function. This section coordinates feeding, monitoring,
+              and user interaction through a series of conditional checks.
+            </p>
+
+            <ul>
+              <li>
+                <code>if (settingState == NOT_SETTING && manualState == MANUAL_IDLE)</code><br>
+                Ensures that automatic feeding only occurs when the user is not editing
+                settings and is not performing a manual feed.
+              </li>
+              <li>
+                <code>if (feedingActive)</code><br>
+                Continuously monitors the feeding process during every loop cycle.
+              </li>
+              <li>
+                <code>if (millis() - lastScreenUpdate &gt; 1000)</code><br>
+                Updates the LCD once per second to prevent flickering and unnecessary
+                performance overhead.
+              </li>
+            </ul>
+
+            <h4 class="title is-5">Scheduled Feeding Check</h4>
+            <p>
+              This function determines whether a scheduled feeding should be triggered.
+              It ensures accurate timing, prevents duplicate activations, and validates
+              feeding conditions.
+            </p>
+
+            <ul>
+              <li>Checks whether the feeder is already active.</li>
+              <li>Obtains current time from the RTC (or simulates time using <code>millis()</code>).</li>
+              <li>Iterates through all feeding slots.</li>
+              <li>Validates slot enable status and assigned food weight.</li>
+              <li>Matches scheduled hour and minute exactly.</li>
+              <li>Prevents multiple triggers within the same minute.</li>
+              <li>Stores last trigger time as a memory checkpoint.</li>
+              <li>Initiates feeding when all conditions are met.</li>
+            </ul>
+
+            <h4 class="title is-5">startFeeding()</h4>
+            <p>
+              This function initializes a feeding session but does not directly dispense
+              food. Instead, it prepares all states and safety mechanisms required for
+              controlled feeding.
+            </p>
+
+            <ul>
+              <li>Identifies the feeding type (scheduled or manual).</li>
+              <li>Sets feeding-related state flags.</li>
+              <li>Computes target weight and required food amount.</li>
+              <li>Initializes timing and jam-detection safety tracking.</li>
+              <li>Outputs debug information via serial monitor.</li>
+              <li>Activates the feeder mechanism.</li>
+              <li>Updates the user interface.</li>
+            </ul>
+
+            <h4 class="title is-5">Manual Feeding Initialization</h4>
+            <p>
+              Manual feeding follows a similar initialization process as scheduled
+              feeding, but is triggered directly by user input and does not rely on
+              predefined feeding slots.
+            </p>
+
+            <h4 class="title is-5">Feeding Monitor (Scheduled & Manual)</h4>
+            <p>
+              This function continuously monitors the feeding process and ensures safe
+              and accurate operation.
+            </p>
+
+            <ul>
+              <li>Runs only when feeding is active (guard clause).</li>
+              <li>Caches key sensor values to reduce noise and CPU load.</li>
+              <li>Stops feeding once the target weight is reached.</li>
+              <li>Detects feeder jams or lack of food flow.</li>
+              <li>Enforces hard safety timeouts.</li>
+              <li>Logs periodic feeding status.</li>
+            </ul>
+
+            <h4 class="title is-5">finishFeeding()</h4>
+            <p>
+              This function finalizes the feeding session, whether completed normally
+              or terminated due to an error.
+            </p>
+
+            <ul>
+              <li>Captures the feeding context before reset.</li>
+              <li>Logs feeding results and events.</li>
+              <li>Resets all feeding-related states.</li>
+              <li>Validates system state and provides debug feedback.</li>
+              <li>Updates the LCD with user feedback.</li>
+            </ul>
+
+            <h4 class="title is-5">resetSystemState()</h4>
+            <p>
+              This function performs a clean system reset, ensuring the feeder returns
+              to a known safe idle state.
+            </p>
+
+            <ul>
+              <li>Resets all feeding schedules and slot configurations.</li>
+              <li>Clears feeding history records.</li>
+              <li>Reinitializes weight sensors.</li>
+              <li>Forces hardware and UI into a safe closed state.</li>
+            </ul>
+
+            <h4 class="title is-5">Setting Mode Handling</h4>
+            <p>
+              This logic manages scheduled feeding configuration, following the flow:
+              <em>enter mode → set hour → set minute → set weight → save → exit</em>.
+            </p>
+
+            <h4 class="title is-5">Adjust Setting Value</h4>
+            <p>
+              Handles value incrementation and decrementation within the setting mode,
+              directly supporting user interaction.
+            </p>
+
+            <h4 class="title is-5">Save Current Slot</h4>
+            <p>
+              Stores edited schedule parameters and provides immediate visual feedback
+              on the LCD.
+            </p>
+
+            <h4 class="title is-5">Add Feed Log</h4>
+            <p>
+              Records completed feeding events into the system history for tracking and analysis.
+            </p>
+
+            <ul>
+              <li>Shifts older logs to maintain buffer space.</li>
+              <li>Retrieves current time from RTC or simulated clock.</li>
+              <li>Stores feeding metadata, target weight, and final weight.</li>
+              <li>Safely manages log count to prevent overflow.</li>
+            </ul>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 
 <!--End BibTex citation -->
